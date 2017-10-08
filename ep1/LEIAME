@@ -1,0 +1,12 @@
+Certifique-se que tenha a biblioteca readline instalada. Caso não tenha, rode "sudo apt-get install libreadline-dev" no Ubuntu.
+
+Para compilar os dois códigos, rode "make" no terminal.
+
+Para executar o shell, digite "./ep1sh"
+Para executar os escalonadores, digite "./ep1 x in out"
+	onde x é o número do escalonador desejado:
+		1 - Shortest Job First
+		2 - Round Robin
+		3 - Priority
+
+	in é o arquivo de entrada (trace) e out é o arquivo de saída (onde serão impressas as informações da simulação)

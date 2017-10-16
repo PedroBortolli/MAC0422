@@ -1,0 +1,13 @@
+Para compilar o código execute o comando "make" no terminal.
+
+Para executar o código, faça:
+
+./ep2 d n v
+
+Onde d é o comprimento da pista de corrida, n é o número de ciclistas e v é o número de voltas da prova.
+
+Adicionalmente, pode ser utilizada alguma das flags adicionais de execução:
+
+Ao final dos parâmetros acima, adicione -d para acessar o modo debug, no qual todas as posições da pista são
+impressas a cada simulação da corrida. Com a flag -r é possível omitir as informações da colocação de cada
+ciclista volta a volta, fazendo com que a única informação impressa seja o relatório final da corrida.

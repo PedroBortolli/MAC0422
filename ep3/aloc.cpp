@@ -7,6 +7,13 @@ using namespace std;
 mem info_aloc;
 vector <process> proc_aloc;
 
+void print_memory(vector <int> memory) {
+	printf("\n");
+	for (int i = 0; i < memory.size(); i++)
+		printf("%d", memory[i]);
+	printf("\n");
+}
+
 void aloc_init(vector <process> processos, mem info_init) {
 
     proc_aloc = processos;
@@ -21,7 +28,6 @@ void aloc_init(vector <process> processos, mem info_init) {
 int aloc_best(vector <int> &memory, process proc) {
 	int cont = 0, pos = -1, best = 9999999, //best = infinito
 	need = proc.b / info_aloc.aloc_size + (proc.b % info_aloc.aloc_size != 0);
-	printf("Need = %d  pro  processo %s\n", need, proc.name);
 
 	for (int i = 0; i < memory.size(); i++) {
 		if (!memory[i]) cont++;
@@ -36,23 +42,44 @@ int aloc_best(vector <int> &memory, process proc) {
 	if (cont < best && cont >= need) {
 		pos = memory.size()-cont;
 	}
-	printf("	pos = %d\n", pos);
+	if (pos == -1) {
+		return -1;
+	}
+	for (int i = pos; i < pos+need; i++) {
+		memory[i] = proc.id;
+	}
+	print_memory(memory);
+	return pos;
+}
+
+int aloc_worst(vector <int> &memory, process proc) {
+	int cont = 0, pos = -1, best = 0, //best = -infinito
+	need = proc.b / info_aloc.aloc_size + (proc.b % info_aloc.aloc_size != 0);
+
+	for (int i = 0; i < memory.size(); i++) {
+		if (!memory[i]) cont++;
+		else {
+			if (cont > best && cont >= need) {
+				best = cont;
+				pos = i-cont;
+			}
+			cont = 0;
+		}
+	}
+	if (cont > best && cont >= need) {
+		pos = memory.size()-cont;
+	}
 	if (pos == -1) {
 		printf("Sem espaco para alocar o processo %s\n", proc.name);
 		return -1;
 	}
 	for (int i = pos; i < pos+need; i++) {
-		memory[i] = 1;
+		memory[i] = proc.id;
 	}
 	return pos;
 }
 
-void aloc_worst(vector <int> &memory, process proc) {
-
-
-}
-
-void aloc_quick(vector <int> &memory, process proc) {
+int aloc_quick(vector <int> &memory, process proc) {
 
 
 }
@@ -62,8 +89,19 @@ void free_memory(vector <int> &memory, process proc) {
 	int need = proc.b / info_aloc.aloc_size + (proc.b % info_aloc.aloc_size != 0);
 	for (int i = proc.aloc_pos; i < proc.aloc_pos + need; i++)
 		memory[i] = 0;
-	printf("\n");
-	for (int i = 0; i < memory.size(); i++)
-		printf("%d", memory[i]);
-	printf("\n");
+	print_memory(memory);
+}
+
+void compact(vector <int> &memory, vector <process> &processos) {
+	int cont = 0;
+	for (int i = memory.size()-1; i >= 0; i--) {
+		if (!memory[i]) {
+			memory.erase(memory.begin() + i); 
+			memory.push_back(0);
+		}
+		else {
+			processos[memory[i]-1].aloc_pos = i;
+		}
+	}
+	//print_memory(memory);
 }

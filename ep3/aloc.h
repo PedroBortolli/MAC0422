@@ -9,14 +9,18 @@
 
 using namespace std;
 
+void print_memory(vector <int> memory);
+
 void aloc_init(vector <process> processos, mem info_init);
 
 int aloc_best(vector <int> &memory, process proc);
 
-void aloc_worst(vector <int> &memory, process proc);
+int aloc_worst(vector <int> &memory, process proc);
 
-void aloc_quick(vector <int> &memory, process proc);
+int aloc_quick(vector <int> &memory, process proc);
 
 void free_memory(vector <int> &memory, process proc);
+
+void compact(vector <int> &memory, vector <process> &processos);
 
 #endif

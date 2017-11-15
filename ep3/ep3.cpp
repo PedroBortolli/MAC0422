@@ -14,7 +14,7 @@ void read(FILE * file) {
 	fscanf(file, " %[^\n]", line);
 
 	char* split = strtok(line, " \t");
-	int p;
+	int p = 0;
 	while (split != NULL) {
 		first[p++] = atof(split);
 		split = strtok(NULL, " \t");
@@ -26,6 +26,7 @@ void read(FILE * file) {
     info_init.page_size = first[3];
 
 	int aloc_size = 1;
+	p = 1;
 	while (fscanf(file, " %[^\n]", line) != EOF) {
 		split = strtok(line, " \t");
 		process process_line;
@@ -48,6 +49,7 @@ void read(FILE * file) {
 			cont++;
 			split = strtok(NULL, " \t");
 		}
+		process_line.id = p++;
 		processos_init.push_back(process_line);
         process_line.p.clear();
         process_line.t.clear();
@@ -140,6 +142,15 @@ void print() {
 
 int main(int argc, const char* argv[]) {
 	printf(" ");
+
+	//so pra testar mais rapido :3 depois a gente tira!
+	//usar ./ep3 in que ai ja roda com os parametros 1 e 1 pros algoritmos
+	if (argc == 2) {
+		printf(" \n");
+		read(fopen(argv[1], "r"));
+		simulate(processos_init, 1, 1, info_init);
+		return 0;
+	}
 
     sim();
 

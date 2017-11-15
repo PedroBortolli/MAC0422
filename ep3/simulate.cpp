@@ -33,30 +33,35 @@ void simulate(vector <process> processos, int aloc, int page, mem info) {
 		if (i < processos.size()) {
 			process p = processos[i];
 			if (fabs((double)p.t0 - elapsed) < 0.001) {
-				printf("\n");
-				for (int j = 0; j < memory.size(); j++)
-					printf("%d", memory[j]);
-				printf("\n");
-				switch(aloc) {
-					case 1:
-						pos = aloc_best(memory, p);
-					case 2:
-						aloc_worst(memory, p);
-					case 3:
-						aloc_quick(memory, p);
+				
+				if (!strcmp(p.name, "COMPACTAR")) {
+					printf("Chamando compactar\n");
+					compact(memory, processos);
+					printf("	naisu\n");
 				}
-				switch(page) {
-					case 1:
-						page_optimal();
-					case 2:
-						page_fifo();
-					case 3:
-						page_lru2();
-					case 4:
-						page_lru4();
+
+				else {
+					switch(aloc) {
+						case 1:
+							pos = aloc_best(memory, p);
+						case 2:
+							pos = aloc_worst(memory, p);
+						case 3:
+							pos = aloc_quick(memory, p);
+					}
+					switch(page) {
+						case 1:
+							page_optimal();
+						case 2:
+							page_fifo();
+						case 3:
+							page_lru2();
+						case 4:
+							page_lru4();
+					}
+					processos[i].aloc_pos = pos;
+					final.insert(make_pair(p.tf, i));
 				}
-				processos[i].aloc_pos = pos;
-				final.insert(make_pair(p.tf, i));
 				i++;
 			}
 		}

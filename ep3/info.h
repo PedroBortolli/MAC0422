@@ -10,7 +10,7 @@ using namespace std;
 
 typedef struct info {
 	double t0, tf;
-	int b, aloc_pos;
+	int b, aloc_pos, id;
 	char name[128];
 	vector <int> p, t;
 } process;

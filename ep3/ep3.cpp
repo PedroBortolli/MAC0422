@@ -148,7 +148,7 @@ int main(int argc, const char* argv[]) {
 	if (argc == 2) {
 		printf(" \n");
 		read(fopen(argv[1], "r"));
-		simulate(processos_init, 1, 1, info_init);
+		simulate(processos_init, 1, 2, info_init);
 		return 0;
 	}
 

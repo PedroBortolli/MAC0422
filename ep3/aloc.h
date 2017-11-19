@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
+#include <set>
+#include <map>
 #include "info.h"
 
 using namespace std;
@@ -22,5 +24,9 @@ int aloc_quick(vector <int> &memory, process proc);
 void free_memory(vector <int> &memory, process proc);
 
 void compact(vector <int> &memory, vector <process> &processos);
+
+void get_most_requested(vector <process> processos, vector <int> memory);
+
+void update_most_requested(vector <int> memory);
 
 #endif

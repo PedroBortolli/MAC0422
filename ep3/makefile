@@ -4,7 +4,7 @@
 
 all: ep3
 
-ep3: ep3.o aloc.o page.o simulate.o
+ep3: ep3.o aloc.o page.o simulate.o files.o
 	$(CXX) -o $@ $^ -lreadline
 
 ep3.o: ep3.cpp ep3.h
@@ -19,6 +19,8 @@ page.o: page.cpp page.h
 simulate.o : simulate.cpp simulate.h
 	$(CXX) -c $< -o $@
 
+files.o : files.cpp files.h
+	$(CXX) -c $< -o $@
 
 clean:
 	rm -rf *.o ep3

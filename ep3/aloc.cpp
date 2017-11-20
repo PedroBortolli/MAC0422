@@ -1,3 +1,12 @@
+/*###########################################
+##                                         ##
+##  EP3 - MAC0422 - Sistemas Operacionais  ##
+##  Pedro Vítor Bortolli Santos - 9793721  ##
+##  Jonas Arilho Levy - 9344935            ## 
+##                                         ##
+###########################################*/
+
+
 // trata da alocacao de memoria
 
 #include "aloc.h"
@@ -12,7 +21,7 @@ map <int, set <int> > available_pos;
 void print_memory(vector <int> memory) {
 	printf("\n");
 	for (int i = 0; i < memory.size(); i++)
-		printf("%d", memory[i]);
+		printf("%d", memory[i]-1);
 	printf("\n");
 }
 
@@ -28,9 +37,8 @@ void aloc_init(vector <process> processos, mem info_init) {
 
 //finds the shortest available piece of memory to allocate process
 int aloc_best(vector <int> &memory, process proc) {
-	int cont = 0, pos = -1, best = 9999999, //best = infinito
+	int cont = 0, pos = -1, best = 2000000000, //best = infinito
 	need = proc.b / info_aloc.aloc_size + (proc.b % info_aloc.aloc_size != 0);
-	printf("Need = %d\n", need);
 	for (int i = 0; i < memory.size(); i++) {
 		if (!memory[i]) cont++;
 		else {
@@ -45,13 +53,14 @@ int aloc_best(vector <int> &memory, process proc) {
 		pos = memory.size()-cont;
 	}
 	if (pos == -1) {
+		printf("Sem espaco para alocar o processo %s\n", proc.name);
 		return -1;
 	}
 	for (int i = pos; i < pos+need; i++) {
 		memory[i] = proc.id;
 	}
-	print_memory(memory);
-	printf("Pos = %d\n", pos);
+	//print_memory(memory);
+	files_print_vir(memory, pos);
 	return pos;
 }
 
@@ -79,18 +88,23 @@ int aloc_worst(vector <int> &memory, process proc) {
 	for (int i = pos; i < pos+need; i++) {
 		memory[i] = proc.id;
 	}
+	files_print_vir(memory, pos);
 	return pos;
 }
 
 int aloc_quick(vector <int> &memory, process proc) {
 	int need = need = proc.b / info_aloc.aloc_size + (proc.b % info_aloc.aloc_size != 0);
 	if (often_requested_memory.find(proc.b) != often_requested_memory.end()) {
-		if (available_pos[proc.b].empty()) return -1;
+		if (available_pos[proc.b].empty()) {
+			printf("Sem espaco para alocar o processo %s\n", proc.name);
+			return -1;
+		}
 		else {
 			int pos = *available_pos[proc.b].begin();
 			for (int i = pos; i < pos+need; i++)
 				memory[i] = 1;
 			update_most_requested(memory);
+			files_print_vir(memory, pos);
 			return pos;
 		}
 	}
@@ -104,22 +118,26 @@ int aloc_quick(vector <int> &memory, process proc) {
 			}
 			if (memory[i]) cont = 0;
 		}
-		if (pos == -1) return -1;
+		if (pos == -1) {
+			printf("Sem espaco para alocar o processo %s\n", proc.name);
+			return -1;
+		}
 		else {
 			for (int i = pos; i < pos+need; i++)
 				memory[i] = 1;
 			update_most_requested(memory);
+			files_print_vir(memory, pos);
 			return pos;
 		}
 	}
 }
 
 void free_memory(vector <int> &memory, process proc) {
-	printf("Preciso tirar a partir de %d\n", proc.aloc_pos);
+	//printf("Preciso tirar a partir de %d\n", proc.aloc_pos);
 	int need = proc.b / info_aloc.aloc_size + (proc.b % info_aloc.aloc_size != 0);
 	for (int i = proc.aloc_pos; i < proc.aloc_pos + need; i++)
 		memory[i] = 0;
-	print_memory(memory);
+	files_print_vir(memory, 0);
 }
 
 void compact(vector <int> &memory, vector <process> &processos) {
@@ -133,7 +151,7 @@ void compact(vector <int> &memory, vector <process> &processos) {
 			processos[memory[i]-1].aloc_pos = i;
 		}
 	}
-	print_memory(memory);
+	//print_memory(memory);
 }
 
 void get_most_requested(vector <process> processos, vector <int> memory) {
@@ -152,7 +170,7 @@ void get_most_requested(vector <process> processos, vector <int> memory) {
 			s.insert(make_pair(mp[mem], mem));
 		}
 	}
-	int cont = 10;
+	int cont = 3;
 	while (!s.empty() && cont) {
 		cont--;
 		set <pair <int, int> >::reverse_iterator it = s.rbegin();

@@ -8,6 +8,7 @@
 #include <set>
 #include <map>
 #include "info.h"
+#include "files.h"
 
 using namespace std;
 

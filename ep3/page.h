@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <vector>
 #include <queue>
+#include <list>
 #include <ctime>
 #include "info.h"
 
@@ -29,7 +30,7 @@ typedef struct process_pages {
 } process_pages;
 
 
-void page_init(vector <process> processos, mem info_init);
+void page_init(vector <process> processos, mem info_init, int mode);
 
 void page_optimal(int pos, process proc);
 
@@ -47,7 +48,11 @@ void page_load(int id_page, int id_frame);
 
 void page_suspend(int id_page, int id_frame);
 
-void print_memory(int id, int offset, int mode);
+void page_reset_r();
+
+void page_end_process(process proc);
+
+int page_fault_number();
 
 void page_exit();
 

@@ -1,3 +1,12 @@
+/*###########################################
+##                                         ##
+##  EP3 - MAC0422 - Sistemas Operacionais  ##
+##  Pedro Vítor Bortolli Santos - 9793721  ##
+##  Jonas Arilho Levy - 9344935            ## 
+##                                         ##
+###########################################*/
+
+
 #include "files.h"
 
 using namespace std;
@@ -11,7 +20,7 @@ void files_init(mem info_init) {
     //cria arquivo de memoria
     sz = info_init.aloc_size;
     vir_sz = info_init.virt;
-    printf("sz = %d\n", sz);
+    //printf("sz = %d\n", sz);
 
     memset(tmp_mem,0,sizeof(tmp_mem));
     memset(tmp_vir,0,sizeof(tmp_vir));
@@ -33,6 +42,15 @@ void files_init(mem info_init) {
     fwrite (array_vir, sizeof(char), info_init.virt, file_vir);
 }
 
+void files_print_bitmap(vector <int> memory) {
+    printf("Estado do bitmap:\n");
+    for (int i = 0; i < memory.size(); i++) {
+        if (memory[i]) printf("1");
+        else printf("0");
+    }
+    printf("\n");
+}
+
 void files_print_mem(int id, int offset) {
 
     char temp_array[sz];
@@ -44,7 +62,7 @@ void files_print_mem(int id, int offset) {
     fwrite (temp_array, sizeof(char), sz, file_mem);
 }
 
-void files_print_vir(vector <int> memory) {
+void files_print_vir(vector <int> memory, int offset) {
 
     char temp_array[vir_sz];
     int p = 0;
@@ -54,8 +72,7 @@ void files_print_vir(vector <int> memory) {
         }
     }
 
-    int offset = 1; //q q eu ponho nesse offset? O.o
-    fseek(file_vir, offset, SEEK_SET);
+    fseek(file_vir, offset*sz, SEEK_SET);
     fwrite(temp_array, sizeof(char), vir_sz, file_vir);
 }
 

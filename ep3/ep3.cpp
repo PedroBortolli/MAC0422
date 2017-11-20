@@ -1,3 +1,12 @@
+/*###########################################
+##                                         ##
+##  EP3 - MAC0422 - Sistemas Operacionais  ##
+##  Pedro Vítor Bortolli Santos - 9793721  ##
+##  Jonas Arilho Levy - 9344935            ## 
+##                                         ##
+###########################################*/
+
+
 #include "ep3.h"
 #include "aloc.h"
 #include "page.h"
@@ -107,7 +116,7 @@ void sim() {
                 if(!arq) printf("Favor carregar um arquivo antes de executar!\n");
                 else if(aloc <= 0 || aloc >= 4) printf("Favor inserir um espaco antes de executar!\n");
                 else if(page <= 0 || page >= 5) printf("Favor inserir um tamanho de pagina antes de executar!\n");
-                else simulate(processos_init, aloc, page, info_init);
+                else simulate(processos_init, aloc, page, info_init, atof(stack[1]));
             }
             else printf("Comando invalido\n");
         }
@@ -133,7 +142,7 @@ void print() {
 		printf("%.1lf %.1lf %d\n", processos_init[i].t0, processos_init[i].tf, processos_init[i].b);
 		printf("	");
 		for (int j = 0; j < processos_init[i].p.size(); j++) {
-			printf("%d %d ", processos_init[i].p[j], processos_init[i].t[j]);
+			printf("%lf %lf ", processos_init[i].p[j], processos_init[i].t[j]);
 		}
 		printf("\n\n");
 	}
@@ -141,16 +150,8 @@ void print() {
 
 
 int main(int argc, const char* argv[]) {
-	printf(" ");
-
-	//so pra testar mais rapido :3 depois a gente tira!
-	//usar ./ep3 in que ai ja roda com os parametros 1 e 1 pros algoritmos
-	if (argc == 2) {
-		printf(" \n");
-		read(fopen(argv[1], "r"));
-		simulate(processos_init, 1, 2, info_init);
-		return 0;
-	}
+	printf(" \n");
+	printf("\n");
 
     sim();
 

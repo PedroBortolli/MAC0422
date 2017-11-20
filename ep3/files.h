@@ -11,9 +11,11 @@ using namespace std;
 
 void files_init(mem info_init);
 
+void files_print_bitmap(vector <int> memory);
+
 void files_print_mem(int id, int offset);
 
-void files_print_vir(vector <int> memory);
+void files_print_vir(vector <int> memory, int offset);
 
 void files_close();
 

@@ -1,0 +1,35 @@
+Para compilar o código abra o terminal e digite o comando 'make'
+
+Para executar o EP, faça ./ep3
+
+Um shell será inicializado. Para selecionar os algoritmos a serem manipulados, digite:
+
+espaco <num>
+
+Onde num:
+	1 = Best Fit
+	2 = Worst Fit
+	3 = Quick Fit
+
+
+substitui <num>
+
+Onde num:
+	1 = Optimal
+	2 = First in, first out
+	3 = Least recently used (versão 2)
+	4 = Least recently used (versão 4)
+
+
+carrega <in>
+
+Onde in é o arquivo trace a ser fornecido
+
+
+
+Para executar o código, digite 'executa <num>'
+
+Onde num é o tempo em que será impresso o estado do bitmap (por exemplo, se colocar 5, o código imprimirá o estado do bitmap a cada 5 segundos simulados).
+
+
+Para sair do shell, digite 'sai'.

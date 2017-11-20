@@ -6,11 +6,12 @@
 #include <string.h>
 #include <vector>
 #include <set>
+#include <queue>
 #include <math.h>
 #include "info.h"
 
 using namespace std;
 
-void simulate(vector <process> processos, int aloc, int page, mem info);
+void simulate(vector <process> processos, int aloc, int page, mem info, double debug);
 
 #endif

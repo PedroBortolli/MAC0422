@@ -12,7 +12,10 @@ typedef struct info {
 	double t0, tf;
 	int b, aloc_pos, id;
 	char name[128];
-	vector <int> p, t;
+	vector <double> p, t;
+	bool operator<(const struct info &p) const {
+		return true;
+	}
 } process;
 
 typedef struct memory_info {

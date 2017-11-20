@@ -1,3 +1,12 @@
+/*###########################################
+##                                         ##
+##  EP3 - MAC0422 - Sistemas Operacionais  ##
+##  Pedro Vítor Bortolli Santos - 9793721  ##
+##  Jonas Arilho Levy - 9344935            ## 
+##                                         ##
+###########################################*/
+
+
 // trata da paginacao
 
 #include "page.h"
@@ -6,15 +15,19 @@
 using namespace std;
 
 mem info_page;
-int n_frames;
+int n_frames, n_page_fault;
 vector <process> proc_page;
 vector <vir_page> page_table;
 vector <frame> frame_table;
 vector <process_pages> pages_of;
+//2
 queue <int> fifo_page;
-int **mat;
+//3
+bool **mat;
+//4
+vector < list <bool> > counter;
 
-void page_init(vector <process> processos, mem info_init) {
+void page_init(vector <process> processos, mem info_init, int mode) {
 
     proc_page = processos;
 
@@ -24,16 +37,37 @@ void page_init(vector <process> processos, mem info_init) {
     info_page.page_size = info_init.page_size;
 
     n_frames = (info_page.total / info_page.page_size) + (info_page.total % info_page.page_size != 0);
+    n_page_fault = 0;
 
-    //inicializa matriz
-    mat = (int**)malloc(n_frames * sizeof(int*));
-    for (int i = 0; i < n_frames; i++) {
-        mat[i] = (int*)malloc(n_frames * sizeof(int));
-    }
-    for (int i = 0; i < n_frames; i++) {
-        for (int j = 0; j < n_frames; j++) {
-            int mat[i][j];
-        }
+    switch(mode) {
+        case 1:
+            //optimal
+            break;
+        case 2:
+            //fifo
+            break;
+        case 3:
+            //inicializa matriz
+            mat = (bool**)malloc(n_frames * sizeof(bool*));
+            for (int i = 0; i < n_frames; i++) {
+                mat[i] = (bool*)malloc(n_frames * sizeof(bool));
+            }
+            for (int i = 0; i < n_frames; i++) {
+                for (int j = 0; j < n_frames; j++) {
+                    mat[i][j] = 0;
+                }
+            }
+            break;
+        case 4:
+            //inicializa counter
+            for (int i = 0; i < n_frames; i++) {
+                list <bool> l;
+                for (int j = 0; j < 8; j++) {
+                    l.push_back(0);
+                }
+                counter.push_back(l);
+            }
+            break;
     }
 
     //cria frames
@@ -49,20 +83,24 @@ void page_init(vector <process> processos, mem info_init) {
 
 void page_optimal(int pos, process proc) {
 
-    if (page_unpaged_process(proc.id)) page_create(proc, pos);
+    page_fifo(pos, proc);
 
 }
 
 void page_fifo(int pos, process proc) {
 
-    if (page_unpaged_process(proc.id)) page_create(proc, pos);
+    int proc_page_id, target_page_id, target_frame_id;
 
-    int proc_pos, proc_page_id, target_page_id, target_frame_id;
-    proc_pos = (pos - page_table[pages_of[proc.id].page_id[0]].base);
-    proc_page_id = proc_pos / info_page.page_size;
+    if (page_unpaged_process(proc.id)) {
+        page_create(proc, pos);
+        pos = (pos - page_table[pages_of[proc.id].page_id[0]].base);
+    }
+
+    proc_page_id = pos / info_page.page_size;
     target_page_id = pages_of[proc.id].page_id[proc_page_id];
 
     if (!page_table[target_page_id].loaded) {
+        n_page_fault++;
         if(fifo_page.size() >= n_frames) {
             int page_to_suspend = fifo_page.front();
             fifo_page.pop();
@@ -91,27 +129,31 @@ void page_fifo(int pos, process proc) {
         }
         fifo_page.push(target_page_id);
     }
-
 }
 
 void page_lru2(int pos, process proc) {
 
-    if (page_unpaged_process(proc.id)) page_create(proc, pos);
+    int proc_page_id, target_page_id, target_frame_id;
 
-    int proc_pos, proc_page_id, target_page_id, target_frame_id;
-    proc_pos = (pos - page_table[pages_of[proc.id].page_id[0]].base);
-    proc_page_id = proc_pos / info_page.page_size;
+    if (page_unpaged_process(proc.id)) {
+        page_create(proc, pos);
+        pos = (pos - page_table[pages_of[proc.id].page_id[0]].base);
+    }
+
+    proc_page_id = pos / info_page.page_size;
     target_page_id = pages_of[proc.id].page_id[proc_page_id];
 
     if (!page_table[target_page_id].loaded) {
+        n_page_fault++;
         int i;
         for (i = 0; i < n_frames; i++) {
             int count = 0;
             for (int j = 0; j < n_frames; j++) {
-                count += mat[i][j];
+                count = count + (int)mat[i][j];
             }
             if (!count) {
-                page_suspend(frame_table[i].page_id, i);
+                if(!frame_table[i].empty)
+                    page_suspend(frame_table[i].page_id, i);
                 break;
             }
         }
@@ -126,6 +168,7 @@ void page_lru2(int pos, process proc) {
             files_print_mem(page_table[target_page_id].pid, ini);
         }
     }
+
     target_frame_id = page_table[target_page_id].frame_id;
     for (int i = 0; i < n_frames; i++) {
         mat[target_frame_id][i] = 1;
@@ -138,7 +181,49 @@ void page_lru2(int pos, process proc) {
 
 void page_lru4(int pos, process proc) {
 
-    if (page_unpaged_process(proc.id)) page_create(proc, pos);
+    int proc_page_id, target_page_id, target_frame_id;
+
+    if (page_unpaged_process(proc.id)) {
+        page_create(proc, pos);
+        pos = (pos - page_table[pages_of[proc.id].page_id[0]].base);
+    }
+
+    proc_page_id = pos / info_page.page_size;
+    target_page_id = pages_of[proc.id].page_id[proc_page_id];
+
+    if (!page_table[target_page_id].loaded) {
+        n_page_fault++;
+        int min = 11111111, min_frame;
+        for (int i = 0; i < n_frames; i++) {
+            int count = 0;
+            for (std::list<bool>::iterator it = counter.at(i).begin();
+            it != counter.at(i).end(); ++it) {
+                count += (int) *it;
+            }
+            if (count < min) {
+                min = count;
+                min_frame = i;
+            }
+        }
+        if(!frame_table[min_frame].empty)
+            page_suspend(frame_table[min_frame].page_id, min_frame);
+
+        page_load(target_page_id, min_frame);
+        // print i na memoria fisica
+        int allocated_size = 0;
+        while (allocated_size < proc.b)
+            allocated_size += info_page.aloc_size;
+        for (int ini = min_frame * info_page.page_size;
+            ini <= allocated_size;
+            ini += info_page.aloc_size) {
+            files_print_mem(page_table[target_page_id].pid, ini);
+        }
+    }
+    target_frame_id = page_table[target_page_id].frame_id;
+    for (int i = 0; i < n_frames; i++) {
+        counter.at(i).pop_back();
+        counter.at(i).push_front(frame_table[i].r);
+    }
 
 }
 
@@ -190,6 +275,36 @@ void page_suspend(int id_page, int id_frame) {
     frame_table[id_frame].empty = 1;
 
     page_table[id_page].loaded = 0;
+}
+
+void page_reset_r() {
+
+    for (int i = 0; i < n_frames; i++) {
+        frame_table[i].r = 0;
+    }
+}
+
+void page_end_process(process proc) {
+
+    int n_of_pages = pages_of[proc.id].page_id.size();
+    for (int i = 0; i < n_of_pages; i++) {
+        int this_page_id = pages_of[proc.id].page_id.at(i);
+        if(page_table[this_page_id].loaded) {
+            int this_frame_id = page_table[this_page_id].frame_id;
+            page_suspend(this_page_id, this_frame_id);
+            // print -1 na memoria fisica
+            for (int ini = this_frame_id * info_page.page_size;
+                ini <= (this_frame_id + 1)* info_page.page_size;
+                ini += info_page.aloc_size) {
+                files_print_mem(-1, ini);
+            }
+        }
+    }
+}
+
+int page_fault_number() {
+
+    return n_page_fault;
 }
 
 void page_exit() {
